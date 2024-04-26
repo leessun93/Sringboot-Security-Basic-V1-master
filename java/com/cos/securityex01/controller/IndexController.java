@@ -27,6 +27,7 @@ public class IndexController {
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	//이선흠 config 에서 설정한 패스워드 암소화 오버라이딩 매서드 한 내용 불러옴 암호화 설정 파일인듯 join에서 씀
 
 	@GetMapping({ "", "/" })
 	public @ResponseBody String index() {
@@ -53,7 +54,8 @@ public class IndexController {
 	
 	//@PostAuthorize("hasRole('ROLE_MANAGER')")
 	//@PreAuthorize("hasRole('ROLE_MANAGER')")
-	@Secured("ROLE_MANAGER")
+	@Secured("ROLE_MANAGER")	//시큐어드 어노테이션을 달면 session에 해당 권한이 있는 사용자만 접근 가능
+	//@PreAuthrize("hasRole('ROLE_MANAGER') or hasRole()") 이건 매서드 실행 전에 실행되는 어노테이션임 권한 여러개를 설정할 때 씀
 	@GetMapping("/manager")
 	public @ResponseBody String manager() {
 		return "매니저 페이지입니다.";
@@ -72,9 +74,9 @@ public class IndexController {
 	@PostMapping("/joinProc")
 	public String joinProc(User user) {
 		System.out.println("회원가입 진행 : " + user);
-		String rawPassword = user.getPassword();
-		String encPassword = bCryptPasswordEncoder.encode(rawPassword);
-		user.setPassword(encPassword);
+		String rawPassword = user.getPassword(); //유저가 쓴 패스워드를 보존
+		String encPassword = bCryptPasswordEncoder.encode(rawPassword);//유저의 패스워드를 처음에 선언한 클래스의 매서드함수로 암호화 작업
+		user.setPassword(encPassword);	//암호화된 패스워드 Dto에 입력
 		user.setRole("ROLE_USER");
 		userRepository.save(user);
 		return "redirect:/";
